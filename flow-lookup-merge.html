@@ -1,14 +1,10 @@
 <!DOCTYPE html>
-<html lang="en"
-      class="dark">
+<html lang="en" class="dark">
 	<head>
 		<meta charset="UTF-8"/>
-		<meta name="viewport"
-		      content="width=device-width, initial-scale=1.0"/>
-		<meta http-equiv="X-UA-Compatible"
-		      content="ie=edge"/>
-		<link rel="stylesheet"
-		      href="https://cdn.simplecss.org/simple.min.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+		<link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 			<title>Pragmatique</title>
 		</head>
 		<body>
@@ -16,21 +12,234 @@
 				<nav>
 					<a href="/index.html" class="current">Home</a>
 					<a href="https://github.com/kevquirk/simple.css/wiki">RightDesign</a>
-					
 				</nav>
 				<h1>Power Automate - lookups, matching and dictionaries</h1>
 				<p>Pragmatique - Engineering practise and documentation</p>
 			</header>
 			<main>
-				
-			
-				<h2><a href="./flow-lookup-merge">Power Automate - lookups, matching and dictionaries</a></h2>
+				<h2>
+					<a href="./flow-lookup-merge">Power Automate - lookups, matching and dictionaries</a>
+				</h2>
 				<p class="meta">Posted on: 14 Mar 2023</p>
 				<p>In Power Automate, sometimes you have a need to "enrich" one set of objects, with some parameters from another object. This is a remix of a <a href="https://www.youtube.com/watch?v=AqcKMUh5JG0">PaulieM video</a>, where he uses XPath to achieve this. I want to explore a way where we use the JSON objects themselves as the lookup.</p>
+				<section>
+					<h2>Overview</h2>
+					<p>We have 2 sets of information:</p>
+					<div style="display: grid; grid-template-columns: 2fr  1fr 2fr;column-gap:1em;">
+						<table>
+							<caption>Leaf level data</caption>
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Number</th>
+									<th>Team</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Jackie</td>
+									<td>012345</td>
+									<td>Blue</td>
+								</tr>
+								<tr>
+									<td>Lucy</td>
+									<td>112346</td>
+									<td>Green</td>
+									
+								</tr>
+								<tr>
+									<td>David</td>
+									<td>493029</td>
+									<td>Blue</td>
+								</tr>
+								<tr>
+									<td>Kerry</td>
+									<td>395499</td>
+									<td>Green</td>
+								</tr>
+								<tr>
+									<td>Steve</td>
+									<td>002458</td>
+									<td>Red</td>
+								</tr>
+							</tbody>
+						</table>
+						<p class="notice">We need to match the data from <br/><br/><- here <br/><br/><br/>to here-><br/></p>
+						<table>
+						<caption>Lookup data</caption>
+							<thead>
+								<tr>
+									<th>Team</th>
+									<th>Mascot</th>
+									<th>Seasons</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Blue</td>
+									<td>Duck</td>
+									<td>Winter, Summer</td>
+								</tr>
+								<tr>
+									<td>Green</td>
+									<td>Frog</td>
+									<td>Winter, Spring</td>
+								</tr>
+								<tr>
+									<td>Red</td>
+									<td>Eagle</td>
+									<td>Autumn, Summer</td>
+								</tr>
+								
+							</tbody>
+						</table>
+					</div>
+					
+					<p>We need to match on the "Team" column, and append the lookup data</p>
+					
+					<table style="width:100%">
+					<caption>Desired result</caption>
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Number</th>
+									<th>Team</th>
+									<th>Mascot</th>
+									<th>Season 1</th>
+									
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Jackie</td>
+									<td>012345</td>
+									<td>Blue</td>
+									<td>Duck</td>
+									<td>Winter</td>
+								</tr>
+								<tr>
+									<td>Lucy</td>
+									<td>112346</td>
+									<td>Green</td>
+									<td>Frog</td>
+									<td>Winter</td>
+									
+								</tr>
+								<tr>
+									<td>David</td>
+									<td>493029</td>
+									<td>Blue</td>
+									<td>Duck</td>
+									<td>Winter</td>
+								</tr>
+								<tr>
+									<td>Kerry</td>
+									<td>395499</td>
+									<td>Green</td>
+									<td>Frog</td>
+									<td>Winter</td>
+								</tr>
+								<tr>
+									<td>Steve</td>
+									<td>002458</td>
+									<td>Red</td>
+									<td>Eagle</td>
+									<td>Autumn</td>
+								</tr>
+							</tbody>
+						</table>
+						
+				</section>
+				<section>
+					<h2>Step 1</h2>
+					<h3>Extract the lookup data</h3>
+					<p>Use any method to get your data:</p>
+					<ul>
+						<li>Sharepoint List</li>
+						<li>Database</li>
+						<li>Compose action</li>
+					</ul>
+					To try this with the sample values, use this code in a Compose action:
+									<pre><code>[
+ {
+ "Team":"Blue"
+ ,"Mascot":"Duck"
+ ,"Seasons":"Winter,Summer"
+ },
+ {
+ "Team":"Green"
+ ,"Mascot":"Frog"
+ ,"Seasons":"Winter,Spring"
+ },
+ {
+ "Team":"Red"
+ ,"Mascot":"Eagle"
+ ,"Seasons":"Autumn, Summer"
+ }
+]
+</code></pre>
+				</section>
+
+				<section>
+					<h2>Step 2</h2>
+					<h3>Transform  the lookup data to an array of objects</h3>
+					<p>Use a Select action to assign key: value pairs - where the value is a structure of desired lookup columns:</p>
+					
+					<article>
+					<p>From *</p>
+					<p class="notice">[Your object from step 1]</p>
+					
+					<p>Map *</p>
+					<pre><code>
+ {
+ "[IDENTITY]":{
+	 "Mascot":[MascotValue]
+	 ,"Seasons":[SeasonValue]
+	 }
+ }
+
+</code></pre>
+</article>
+<p>The quotes around the [IDENTITY] column are required if it is a number. All keys in an object must be strings.</p>
+				</section>
+				<section>
+					<h2>Step 3</h2>
+					<h3>Transform the array into a dictionary object</h3>
+					<p>We now have an array of key-value pairs, which is <strong>almost</strong> what we want. We need to transform this into a single object, by using a join and some string manipulation. This step is thanks to <a href="#">Tom Riha and his take</a> on how to do it.</p>
+					
+					<p>Use a compose step to:</p>
+					<ul>
+						<li>Join - join the array into a single string
+							<ul>
+								<li>Replace - replace any subsequent objects with a comma
+									<ul>
+										<li>JSON - turn the string back into an object
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</ul>
+					<pre><code>
+json(replace(join([body('SELECT')],''),'}{',','))
+
+</code></pre>
+				</section>
 				
-				
-				
-				
+				<section>
+					<h2>Onward</h2>
+					<h3>Use the lookup / dictionary / map to assign values</h3>
+					<p>You can now get the required column, via the lookup object, with the key:
+					<pre><code>
+body('LOOKUP')?[KEYVALUE]?['Mascot']
+
+</code></pre>
+<p>If your key values in your source are numbers, turn them into strings:
+					<pre><code>
+body('LOOKUP')?[string(KEYVALUE)]?['Mascot']
+
+</code></pre>
+
+				</section>
 			</main>
 		</body>
 	</html>
