@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"
+      class="dark">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport"
+		      content="width=device-width, initial-scale=1.0"/>
+		<meta http-equiv="X-UA-Compatible"
+		      content="ie=edge"/>
+		<link rel="stylesheet"
+		      href="https://cdn.simplecss.org/simple.min.css">
+			<title>Pragmatique</title>
+		</head>
+		<body>
+			<header>
+				<nav>
+					<a href="./" class="current">Home</a>
+					<a href="https://rightdesign.com.au/">RightDesign</a>
+					
+				</nav>
+				<h1>Microsoft Forms - source text search</h1>
+				<p>Pragmatique - Engineering practise and documentation</p>
+			</header>
+			<main>
+				<h2>
+					<a href="./forms-text-search">Microsoft Forms - source text search</a>
+				</h2>
+				<p class="meta">Posted on: 14 Nov 2024</p>
+				<p>
+				I had a need recently to modify a Microsoft Forms form. This involved changing quite a few duplicated options in dropdown lists.
+				</p>
+				<p><strong>The problem </strong>was to verify that all instances of the text had been removed from the dropdowns. </p>
+				<p><strong>The answer </strong>was to view the source of the form as JSON, and use the text search of the browser to verify that the text was not in any of the dropdowns.</p>
+				
+				<p>To do this, you can use the ms form api, from a browser window, in a session where you have already logged in. The url is: <code>https://forms.office.com/formapi/api/forms('-YOUR-FORM-ID-HERE-')?select=id,title,questions&$expand=questions($expand=choices)</code>. This will give you access to all the form schema, including the text for each choice.</p>
+				
+				
+			</main>
+		</body>
+	</html>
