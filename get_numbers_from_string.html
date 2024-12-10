@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"
+      class="dark">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport"
+		      content="width=device-width, initial-scale=1.0"/>
+		<meta http-equiv="X-UA-Compatible"
+		      content="ie=edge"/>
+		<link rel="stylesheet"
+		      href="https://cdn.simplecss.org/simple.min.css">
+			<title>Pragmatique</title>
+		</head>
+		<body>
+			<header>
+				<nav>
+					<a href="./" class="current">Home</a>
+					<a href="https://rightdesign.com.au/">RightDesign</a>
+					
+				</nav>
+				<h1>Power Automate - Get Numbers from string</h1>
+				<p>Pragmatique - Engineering practise and documentation</p>
+			</header>
+			<main>
+				<h2>
+					<a href="./forms-text-search">Power Automate - Get int from string</a>
+				</h2>
+				<p class="meta">Posted on: 11 Dec 2024</p>
+				<p>
+				There are a few versions online for this - the lack of a regex in PA flows causes issues!.
+				</p>
+				<p><strong>The problem </strong>you have a string, with numbers mixed in. You would like to keep these numbers - and convert them to an int. </p>
+				<p><strong>My answer </strong>Is in 2 steps - a filter array step, and the join step.</p>
 
+        <p><strong>Step 1: Filter array</strong> (insert a filter array step).</p>
+
+        <p>
+          <dl>
+            <dt>FROM</dt>
+            <dd>chunk(<your_string_value>,1)</dd>
+          
+            <dt>FILTER QUERY</dt>
+            <dd>chunk('0123456789',1) </dd>
+          
+            <dt>CONTAINS</dt>
+            <dd>item()</dd>
+          </dl>
+
+          This will create an array of single characters, from your string. It then compares them to an array of numbers 0 - 9, and keeps any of the characters that match.
+        </p>
+				
+				<p><strong>Step 2: assign the join</strong> This can be to a Compose, Set variable, or directly into some other output.</p>
+
+        <p>
+				 <dl>
+            <dt>(set the value)</dt>
+            <dd>int(concat('0',join(body('Filter_array'),''))) )</dd>
+          
+          </dl>
+          The array of numbers is joined together with no delimiters. Concatenating a 0 as a prefix avoids errors if the string turns out to have no numbers at all. Finally, we convert to an int.
+        </p>
+			</main>
+		</body>
+	</html>
